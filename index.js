@@ -76,7 +76,7 @@ app.get("/", async (req, res) => {
     }
 
     res.send(
-      `${NAME} ist ${rank}: ${rr} RR${placement} | Heute: ${winsToday}W/${lossesToday}L`
+      `${NAME} ist ${rank}: ${rr} RR${placement}`
     );
 
   } catch (err) {
