@@ -112,7 +112,7 @@ if (matchData.data && Array.isArray(matchData.data)) {
     }
 
     res.send(
-      `${NAME} ist ${rank}: ${rr} RR${placement} | Heute W winsToday/L lossesToday`
+      `${NAME} ist ${rank}: ${rr} RR${placement} | Heute W${winsToday}/L${lossesToday}`
     );
 
   } catch (err) {
