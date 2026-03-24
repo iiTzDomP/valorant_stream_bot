@@ -27,7 +27,7 @@ app.get("/", async (req, res) => {
     const rr = current.ranking_in_tier;
 
       // ===== MATCHES FÜR HEUTE (MMR ENDPOINT) =====
-      let winsToday = 0;
+      /*let winsToday = 0;
       let lossesToday = 0;
 
       const matchResponse = await fetch(
@@ -68,7 +68,43 @@ app.get("/", async (req, res) => {
           }
         }
       }
+*/
+    // ===== MATCHES FÜR HEUTE =====
+let winsToday = 0;
+let lossesToday = 0;
 
+const matchResponse = await fetch(
+  `https://api.henrikdev.xyz/valorant/v3/matches/${REGION}/${encodeURIComponent(NAME)}/${TAG}?mode=competitive&size=10`,
+  { headers: { Authorization: API_KEY } }
+);
+
+const matchData = await matchResponse.json();
+
+const today = new Date().toDateString();
+
+if (matchData.data && Array.isArray(matchData.data)) {
+  for (const match of matchData.data) {
+
+    if (!match.metadata?.game_start) continue;
+
+    const matchDate = new Date(match.metadata.game_start * 1000).toDateString();
+    if (matchDate !== today) continue;
+
+    // Spieler finden
+    const player = match.players?.all_players?.find(
+      p => p.name === NAME && p.tag === TAG
+    );
+
+    if (!player) continue;
+
+    const playerTeam = player.team; // "Red" oder "Blue"
+
+    const didWin = match.teams[playerTeam.toLowerCase()]?.has_won;
+
+    if (didWin === true) winsToday++;
+    if (didWin === false) lossesToday++;
+  }
+}
     // Placement nur wenn vorhanden
     let placement = "";
     if (current.leaderboard_placement) {
@@ -76,7 +112,7 @@ app.get("/", async (req, res) => {
     }
 
     res.send(
-      `${NAME} ist ${rank}: ${rr} RR${placement}`
+      `${NAME} ist ${rank}: ${rr} RR${placement} | Heute W winsToday/L lossesToday`
     );
 
   } catch (err) {
